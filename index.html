@@ -331,12 +331,38 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // ===== LOADING SEQUENCE =====
-  let loadProgress = 0;
-  function runLoading() {
-    const interval = setInterval(() => {
-      loadProgress += Math.random() * 12 + 3;
-      if (loadProgress >= 100) {
+// ===== LOADING SEQUENCE (VERSI PERBAIKAN) =====
+let loadProgress = 0;
+function runLoading() {
+  const totalDuration = 2500;
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = now - startTime;
+    loadProgress = Math.min(100, (elapsed / totalDuration) * 100);
+
+    loadingBar.style.width = loadProgress + '%';
+    loadingPercent.textContent = Math.floor(loadProgress) + '%';
+
+    if (loadProgress < 100) {
+      requestAnimationFrame(step);
+    } else {
+      loadingBar.style.width = '100%';
+      loadingPercent.textContent = '100%';
+
+      setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          overlay.classList.remove('hidden');
+        }, 600);
+      }, 400);
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+runLoading();
         loadProgress = 100;
         loadingBar.style.width = '100%';
         loadingPercent.textContent = '100%';
